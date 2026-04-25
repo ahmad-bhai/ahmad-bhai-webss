@@ -1,29 +1,76 @@
-<div class="api-card">
-    <h3>📸 Web Screenshot Tool</h3>
-    <input type="text" id="siteUrl" placeholder="https://example.com" class="input-box">
-    <button class="btn" onclick="takeShot()">Capture Now 🚀</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahmad Bhai - Web Screenshot</title>
+    <style>
+        :root { --accent: #8646B4; --bg: #0f172a; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 90%; max-width: 500px; background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        h1 { color: var(--accent); margin-bottom: 20px; }
+        .input-box { width: 100%; padding: 15px; border-radius: 10px; border: none; background: rgba(0,0,0,0.3); color: white; margin-bottom: 15px; box-sizing: border-box; outline: none; border: 1px solid transparent; transition: 0.3s; }
+        .input-box:focus { border-color: var(--accent); }
+        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(134,70,180,0.4); }
+        #result { display: none; margin-top: 25px; }
+        #ssImage { width: 100%; border-radius: 10px; border: 2px solid var(--accent); }
+        .loader { display: none; margin: 15px auto; border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📸 Web Capture</h1>
+    <p style="opacity: 0.7;">Take high-quality screenshots instantly.</p>
     
-    <div id="shotResult" style="margin-top: 20px; display: none;">
-        <img id="screenshotImg" src="" style="width: 100%; border-radius: 15px; border: 1px solid var(--accent);">
-        <br>
-        <a id="downloadShot" href="#" download="AhmadBhai_Screenshot.png" class="btn" style="display:inline-block; margin-top:10px;">Download Image</a>
+    <input type="text" id="targetUrl" class="input-box" placeholder="Enter Website URL (https://...)">
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <label><input type="checkbox" id="fullPage"> Full Page</label>
+    </div>
+
+    <button class="btn" onclick="capture()">Capture Screenshot 🚀</button>
+
+    <div class="loader" id="loader"></div>
+
+    <div id="result">
+        <img id="ssImage" src="" alt="Screenshot">
+        <a id="downloadBtn" href="#" download="AhmadBhai_SS.png" style="color: var(--accent); display: block; margin-top: 15px; text-decoration: none; font-weight: bold;">⬇️ Download Image</a>
     </div>
 </div>
 
 <script>
-async function takeShot() {
-    const url = document.getElementById('siteUrl').value;
-    if(!url) return alert("Bhai, URL to dalo!");
-    
-    const api = `https://ahmad-bhai-webss.vercel-link.app/api/screenshot?url=${encodeURIComponent(url)}`;
-    
-    document.getElementById('shotResult').style.display = 'block';
-    const img = document.getElementById('screenshotImg');
-    img.src = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJndzR6NHR4M3B6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif"; // Loader
+    async function capture() {
+        const url = document.getElementById('targetUrl').value;
+        const isFull = document.getElementById('fullPage').checked;
+        if(!url) return alert("Bhai, URL to dalo!");
 
-    img.onload = () => {
-        document.getElementById('downloadShot').href = api;
-    };
-    img.src = api;
-}
+        const loader = document.getElementById('loader');
+        const result = document.getElementById('result');
+        const img = document.getElementById('ssImage');
+        const dl = document.getElementById('downloadBtn');
+
+        loader.style.display = 'block';
+        result.style.display = 'none';
+
+        const apiUrl = `/api/screenshot?url=${encodeURIComponent(url)}&fullPage=${isFull}`;
+
+        img.onload = () => {
+            loader.style.display = 'none';
+            result.style.display = 'block';
+            dl.href = apiUrl;
+        };
+
+        img.onerror = () => {
+            loader.style.display = 'none';
+            alert("Failed to capture. Website might be blocking or taking too long.");
+        };
+
+        img.src = apiUrl;
+    }
 </script>
+
+</body>
+</html>
